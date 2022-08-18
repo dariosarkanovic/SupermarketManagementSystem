@@ -4,9 +4,13 @@ This is a simple Windows Form application for a supermarket created in C#. The u
 Modules and Features
 
 Category Module - Manages all the Category for products (Add New, Update and Delete Existing)
+
 Product Module - Manages all the Product (Add New, Update and Delete Existing)
+
 Seller Module - Manages all the Seller (Add New, Update and Delete Existing)
+
 Selling Module - Manages all the Orders and Bills(Add New, Print and Delete Existing)
+
 
 Login Credentials
 
