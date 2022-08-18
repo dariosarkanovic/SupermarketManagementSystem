@@ -13,7 +13,7 @@ Selling Module - Manages all the Orders and Bills(Add New, Print and Delete Exis
 
 
 # **Database**
-In AppData folder is Supermarket.bak file and that is SQL database for this project
+In AppData folder is Supermarket.bak file and that is SQL database for this project, 
 Extract the Database and restore (Follow Restoring part of this tutorial https://www.youtube.com/watch?v=_yF5Kh_MMKo&list=PLBLPjjQlnVXXH_1g7ApcuIGPWRzMEKreK&index=8)
 
 
