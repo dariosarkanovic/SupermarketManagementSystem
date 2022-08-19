@@ -63,12 +63,13 @@ namespace SupermarketManagementSystem
             }
             else
             {
-                if (PriceTextBox.Text.ToString().Contains(','))
+                string t = PriceTextBox.Text.ToString();
+                if (PriceTextBox.Text.ToString().Contains('.'))
                 {
-                    PriceTextBox.Text.ToString().Replace(',', '.');
+                     t = PriceTextBox.Text.ToString().Replace('.', ',');
                 }
-                double total = Convert.ToDouble(PriceTextBox.Text) * Convert.ToInt32(QuantityTextBox.Text);
-
+                
+                double total = Convert.ToDouble(t) * Convert.ToInt32(QuantityTextBox.Text);
                 DataGridViewRow newRow = new DataGridViewRow();
                 newRow.CreateCells(OrderData);
                 newRow.Cells[0].Value = n + 1;
