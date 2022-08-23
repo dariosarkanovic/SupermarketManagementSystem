@@ -149,7 +149,6 @@ namespace SupermarketManagementSystem
             foreach (DataRow row in categoryTable.Rows)
             {
                 categoryNames.Add(row["Name"].ToString());
-                Console.WriteLine(row["Name"].ToString());
             }
 
             return categoryNames;
@@ -167,7 +166,6 @@ namespace SupermarketManagementSystem
             foreach (DataRow row in categoryTable.Rows)
             {
                 categoryIDs.Add(Convert.ToInt32(row["ID"]));
-                Console.WriteLine(Convert.ToInt32(row["ID"]));
             }
 
             return categoryIDs;
