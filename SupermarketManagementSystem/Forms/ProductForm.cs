@@ -54,30 +54,38 @@ namespace SupermarketManagementSystem
         {
             try
             {
-                connection.Open();
-                string price = PriceTextBox.Text.ToString();
-                List<int> listOfProductIDs = ListOfProductIDs();
-                int sameProductIDindex = listOfProductIDs.FindIndex(x => x == Convert.ToInt32(IDTextBox.Text));
-
-                if (sameProductIDindex != -1)
+                int id = 0;
+                if(!int.TryParse(IDTextBox.Text, out id))
                 {
-                    MessageBox.Show("Entered ID for product alredy exists.");
-                    connection.Close();
+                    MessageBox.Show("Invalid ID");
                 }
                 else
                 {
-                    if (price.Contains(','))
-                    {
-                        price = String.Format("{0:0.00}", Convert.ToDouble(price));
-                    }
-                    string insertQuery = $@"INSERT INTO dbo.Product 
-                            VALUES({IDTextBox.Text}, '{NameTextBox.Text}', {QuantityTextBox.Text}, '{SelectCategoryComboBox.SelectedValue.ToString()}', '{price}')";
-                    SqlCommand cmd = new SqlCommand(insertQuery, connection);
-                    cmd.ExecuteNonQuery();
-                    MessageBox.Show("Product added successfully!");
-                    connection.Close();
+                    connection.Open();
+                    string price = PriceTextBox.Text.ToString();
+                    List<int> listOfProductIDs = ListOfProductIDs();
+                    int sameProductIDindex = listOfProductIDs.FindIndex(x => x == Convert.ToInt32(IDTextBox.Text));
 
-                    DisplayDataFromDB("Product");
+                    if (sameProductIDindex != -1)
+                    {
+                        MessageBox.Show("Entered ID for product alredy exists.");
+                        connection.Close();
+                    }
+                    else
+                    {
+                        if (price.Contains(','))
+                        {
+                            price = String.Format("{0:0.00}", Convert.ToDouble(price));
+                        }
+                        string insertQuery = $@"INSERT INTO dbo.Product 
+                            VALUES({id}, '{NameTextBox.Text}', {QuantityTextBox.Text}, '{SelectCategoryComboBox.SelectedValue.ToString()}', '{price}')";
+                        SqlCommand cmd = new SqlCommand(insertQuery, connection);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Product added successfully!");
+                        connection.Close();
+
+                        DisplayDataFromDB("Product");
+                    } 
                 }
             }
             catch (Exception ex)
@@ -120,14 +128,15 @@ namespace SupermarketManagementSystem
         {
             try
             {
-                if (IDTextBox.Text == "")
+                int id = 0;
+                if (!int.TryParse(IDTextBox.Text, out id))
                 {
-                    MessageBox.Show("Select the Product to Delete.");
+                    MessageBox.Show("Select the ID of Product to Delete.");
                 }
                 else
                 {
                     connection.Open();
-                    string deleteQuery = $"DELETE FROM dbo.Product WHERE ProdID={IDTextBox.Text}";
+                    string deleteQuery = $"DELETE FROM dbo.Product WHERE ProdID={id}";
                     SqlCommand cmd = new SqlCommand(deleteQuery, connection);
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Selected product deleted successfully.");
@@ -143,6 +152,7 @@ namespace SupermarketManagementSystem
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                connection.Close();
             }
         }
 
@@ -170,9 +180,14 @@ namespace SupermarketManagementSystem
         {
             try
             {
+                int id = 0;
                 if (IDTextBox.Text == "" || NameTextBox.Text == "" || QuantityTextBox.Text == "" || PriceTextBox.Text == "")
                 {
                     MessageBox.Show("Missing informations.");
+                }
+                else if(!int.TryParse(IDTextBox.Text, out id))
+                {
+                    MessageBox.Show("Invalid ID");
                 }
                 else
                 {
@@ -191,6 +206,7 @@ namespace SupermarketManagementSystem
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                connection.Close();
             }
         }
 
