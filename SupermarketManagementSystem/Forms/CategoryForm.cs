@@ -21,33 +21,60 @@ namespace SupermarketManagementSystem
         SqlConnection connection = new SqlConnection(@"Data Source=.;Initial Catalog=Supermarket;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
         private void AddButton_Click(object sender, EventArgs e)
         {
-            try { 
+            try
+            {
                 connection.Open();
-                List<string> categoryNames = ListOfCategoryNames();
-                int index = categoryNames.FindIndex(x => x.ToLower() == NameTextBox.Text.ToString().ToLower());
-                
-                if (index != -1)
+
+                if (!Validation())
                 {
-                    MessageBox.Show($@"Category ""{NameTextBox.Text.ToString()}"" alredy exist.");
+                    connection.Close();
                 }
                 else
                 {
                     string insertQuery = $@"INSERT INTO dbo.Category 
-                        VALUES({IDTextBox.Text}, '{NameTextBox.Text}', '{DescriptionTextBox.Text}')";
+                    VALUES({IDTextBox.Text}, '{NameTextBox.Text}', '{DescriptionTextBox.Text}')";
                     SqlCommand cmd = new SqlCommand(insertQuery, connection);
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Category added successfully!");
                     connection.Close();
                     DisplayDataFromDB("Category");
                 }
-                
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
                 connection.Close();
             }
         }
 
+        private bool Validation()
+        {
+            if (IDTextBox.Text == "" || NameTextBox.Text == "")
+            {
+                MessageBox.Show($"Enter ID and Name for Category");
+                connection.Close();
+                return false;
+            }
+            
+                List<string> categoryNames = ListOfCategoryNames();
+                int sameNameIndex = categoryNames.FindIndex(x => x.ToLower() == NameTextBox.Text.ToString().ToLower());
+                List<int> categoryIDs = ListOfCategoryIDs();
+                int sameIDIndex = categoryIDs.FindIndex(x => x == Convert.ToInt32(IDTextBox.Text));
+
+                if (sameNameIndex != -1)
+                {
+                    MessageBox.Show($@"Category ""{NameTextBox.Text.ToString()}"" alredy exist.");
+                    connection.Close();
+                    return false;
+                }
+                else if (sameIDIndex != -1)
+                {
+                    MessageBox.Show($"Entered ID for category alredy exists.");
+                    connection.Close();
+                    return false;
+                }
+            return true;
+        }
         private void CategoryForm_Load(object sender, EventArgs e)
         {
             DisplayDataFromDB("Category");
@@ -83,7 +110,7 @@ namespace SupermarketManagementSystem
                 }
                 else
                 {
-                    var result = MessageBox.Show("If you delete category, all products within this category will be deleted also.", "b", MessageBoxButtons.OKCancel);
+                    var result = MessageBox.Show("If you delete category, all products within this category will be deleted also.", "Warning", MessageBoxButtons.OKCancel);
                     
                     if(result == DialogResult.OK) {
                         connection.Open();
@@ -126,6 +153,24 @@ namespace SupermarketManagementSystem
             }
 
             return categoryNames;
+        }
+
+        List<int> ListOfCategoryIDs()
+        {
+            string query = "SELECT * FROM dbo.Category";
+            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
+            SqlCommandBuilder cmd = new SqlCommandBuilder(adapter);
+            var dataSet = new DataSet();
+            adapter.Fill(dataSet);
+            DataTable categoryTable = dataSet.Tables[0];
+            List<int> categoryIDs = new List<int>();
+            foreach (DataRow row in categoryTable.Rows)
+            {
+                categoryIDs.Add(Convert.ToInt32(row["ID"]));
+                Console.WriteLine(Convert.ToInt32(row["ID"]));
+            }
+
+            return categoryIDs;
         }
         private void EditButton_Click(object sender, EventArgs e)
         {
