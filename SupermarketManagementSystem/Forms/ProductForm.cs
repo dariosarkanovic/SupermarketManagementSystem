@@ -56,23 +56,54 @@ namespace SupermarketManagementSystem
             {
                 connection.Open();
                 string price = PriceTextBox.Text.ToString();
-                if (price.Contains(','))
+                List<int> listOfProductIDs = ListOfProductIDs();
+                int sameProductIDindex = listOfProductIDs.FindIndex(x => x == Convert.ToInt32(IDTextBox.Text));
+
+                if (sameProductIDindex != -1)
                 {
-                    price = String.Format("{0:0.00}", Convert.ToDouble(price));
+                    MessageBox.Show("Entered ID for product alredy exists.");
+                    connection.Close();
                 }
-                string insertQuery = $@"INSERT INTO dbo.Product 
-                        VALUES({IDTextBox.Text}, '{NameTextBox.Text}', {QuantityTextBox.Text}, '{SelectCategoryComboBox.SelectedValue.ToString()}', '{price}')";
-                SqlCommand cmd = new SqlCommand(insertQuery, connection);
-                cmd.ExecuteNonQuery();
-                MessageBox.Show("Product added successfully!");
-                connection.Close();
-                DisplayDataFromDB("Product");
+                else
+                {
+                    if (price.Contains(','))
+                    {
+                        price = String.Format("{0:0.00}", Convert.ToDouble(price));
+                    }
+                    string insertQuery = $@"INSERT INTO dbo.Product 
+                            VALUES({IDTextBox.Text}, '{NameTextBox.Text}', {QuantityTextBox.Text}, '{SelectCategoryComboBox.SelectedValue.ToString()}', '{price}')";
+                    SqlCommand cmd = new SqlCommand(insertQuery, connection);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Product added successfully!");
+                    connection.Close();
+
+                    DisplayDataFromDB("Product");
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                connection.Close();
             }
         }
+
+        List<int> ListOfProductIDs()
+        {
+            string query = "SELECT * FROM dbo.Product";
+            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
+            SqlCommandBuilder cmd = new SqlCommandBuilder(adapter);
+            var dataSet = new DataSet();
+            adapter.Fill(dataSet);
+            DataTable productTable = dataSet.Tables[0];
+            List<int> productIDs = new List<int>();
+            foreach (DataRow row in productTable.Rows)
+            {
+                productIDs.Add(Convert.ToInt32(row["ProdID"]));
+            }
+
+            return productIDs;
+        }
+
         private void DisplayDataFromDB(string nameDB)
         {
             connection.Open();
@@ -126,7 +157,6 @@ namespace SupermarketManagementSystem
 
         private void SelectCategoryComboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //connection.Open();
             string query = $"SELECT * FROM dbo.Product WHERE ProdCategory='{SelectCategoryComboBox2.SelectedValue.ToString()}'";
             SqlDataAdapter dataAdapter = new SqlDataAdapter(query, connection);
             SqlCommandBuilder builder = new SqlCommandBuilder(dataAdapter);
@@ -154,6 +184,7 @@ namespace SupermarketManagementSystem
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Selected product successfully updated.");
                     connection.Close();
+
                     DisplayDataFromDB("Product");
                 }
             }
