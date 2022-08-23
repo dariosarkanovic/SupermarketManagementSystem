@@ -79,5 +79,22 @@ namespace SupermarketManagementSystem
         {
             Application.Exit();
         }
+
+       private void ShowPWCheckBox_CheckStateChanged(object sender, EventArgs e)
+        {
+            if (ShowPWCheckBox.Checked)
+            {
+                PasswordTextBox.UseSystemPasswordChar = false;
+            }
+            else
+            {
+                PasswordTextBox.UseSystemPasswordChar = true;
+            }
+        }
+
+        private void LoginForm_Load(object sender, EventArgs e)
+        {
+            PasswordTextBox.UseSystemPasswordChar = true;
+        }
     }
 }

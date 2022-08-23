@@ -41,6 +41,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.ShowPWCheckBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // guna2CircleButton1
@@ -170,7 +171,7 @@
             this.LoginButton.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LoginButton.ForeColor = System.Drawing.Color.CadetBlue;
             this.LoginButton.HoverState.FillColor = System.Drawing.SystemColors.ActiveCaption;
-            this.LoginButton.Location = new System.Drawing.Point(497, 335);
+            this.LoginButton.Location = new System.Drawing.Point(497, 353);
             this.LoginButton.Name = "LoginButton";
             this.LoginButton.Size = new System.Drawing.Size(180, 45);
             this.LoginButton.TabIndex = 9;
@@ -183,7 +184,7 @@
             this.ClearLabel.Cursor = System.Windows.Forms.Cursors.Hand;
             this.ClearLabel.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold);
             this.ClearLabel.ForeColor = System.Drawing.Color.CadetBlue;
-            this.ClearLabel.Location = new System.Drawing.Point(557, 395);
+            this.ClearLabel.Location = new System.Drawing.Point(558, 403);
             this.ClearLabel.Name = "ClearLabel";
             this.ClearLabel.Size = new System.Drawing.Size(60, 28);
             this.ClearLabel.TabIndex = 10;
@@ -226,11 +227,23 @@
             this.label4.TabIndex = 13;
             this.label4.Text = "Application";
             // 
+            // ShowPWCheckBox
+            // 
+            this.ShowPWCheckBox.AutoSize = true;
+            this.ShowPWCheckBox.Location = new System.Drawing.Point(455, 315);
+            this.ShowPWCheckBox.Name = "ShowPWCheckBox";
+            this.ShowPWCheckBox.Size = new System.Drawing.Size(124, 20);
+            this.ShowPWCheckBox.TabIndex = 14;
+            this.ShowPWCheckBox.Text = "Show password";
+            this.ShowPWCheckBox.UseVisualStyleBackColor = true;
+            this.ShowPWCheckBox.CheckStateChanged += new System.EventHandler(this.ShowPWCheckBox_CheckStateChanged);
+            // 
             // LoginForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(773, 450);
+            this.Controls.Add(this.ShowPWCheckBox);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -248,6 +261,7 @@
             this.Name = "LoginForm";
             this.Text = "SupermarketApp";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.LoginForm_FormClosing);
+            this.Load += new System.EventHandler(this.LoginForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -268,6 +282,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.CheckBox ShowPWCheckBox;
     }
 }
 
