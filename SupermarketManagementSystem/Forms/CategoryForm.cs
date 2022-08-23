@@ -49,7 +49,8 @@ namespace SupermarketManagementSystem
 
         private bool Validation()
         {
-            if (IDTextBox.Text == "" || NameTextBox.Text == "")
+            int id = 0;
+            if (!int.TryParse(IDTextBox.Text, out id) || NameTextBox.Text == "")
             {
                 MessageBox.Show($"Enter ID and Name for Category");
                 connection.Close();
@@ -59,7 +60,7 @@ namespace SupermarketManagementSystem
                 List<string> categoryNames = ListOfCategoryNames();
                 int sameNameIndex = categoryNames.FindIndex(x => x.ToLower() == NameTextBox.Text.ToString().ToLower());
                 List<int> categoryIDs = ListOfCategoryIDs();
-                int sameIDIndex = categoryIDs.FindIndex(x => x == Convert.ToInt32(IDTextBox.Text));
+                int sameIDIndex = categoryIDs.FindIndex(x => x == id);
 
                 if (sameNameIndex != -1)
                 {
@@ -104,9 +105,10 @@ namespace SupermarketManagementSystem
         {
             try
             {
-                if (IDTextBox.Text == "")
+                int id = 0;
+                if (!int.TryParse(IDTextBox.Text, out id))
                 {
-                    MessageBox.Show("Select the Category to Delete.");
+                    MessageBox.Show("Select the ID of Category.");
                 }
                 else
                 {
@@ -114,7 +116,7 @@ namespace SupermarketManagementSystem
                     
                     if(result == DialogResult.OK) {
                         connection.Open();
-                        string deleteQuery = $"DELETE FROM dbo.Category WHERE ID={IDTextBox.Text}";
+                        string deleteQuery = $"DELETE FROM dbo.Category WHERE ID={id}";
                         SqlCommand cmd = new SqlCommand(deleteQuery, connection);
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Selected category deleted successfully.");
@@ -174,7 +176,8 @@ namespace SupermarketManagementSystem
         {
             try
             {
-                if(IDTextBox.Text == "" || NameTextBox.Text == "")
+                int id = 0;
+                if(!int.TryParse(IDTextBox.Text, out id) || NameTextBox.Text == "")
                 {
                     MessageBox.Show("Missing informations.");
                 }
@@ -192,7 +195,7 @@ namespace SupermarketManagementSystem
                     else
                     {
                         string updateQuery = $@"UPDATE dbo.Category SET Name='{NameTextBox.Text}', 
-                                Description='{DescriptionTextBox.Text}' WHERE ID={IDTextBox.Text}";
+                                Description='{DescriptionTextBox.Text}' WHERE ID={id}";
                         SqlCommand command = new SqlCommand(updateQuery, connection);
                         command.ExecuteNonQuery();
                         MessageBox.Show("Selected product successfully updated.");
