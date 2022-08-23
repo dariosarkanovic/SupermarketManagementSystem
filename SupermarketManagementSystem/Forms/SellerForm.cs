@@ -24,21 +24,76 @@ namespace SupermarketManagementSystem
         {
             try
             {
-                connection.Open();
-                string insertQuery = $@"INSERT INTO dbo.Seller 
+                
+                int id = 0;
+                if (!int.TryParse(IDTextBox.Text, out id)) {
+                    MessageBox.Show("Invalid ID");
+                    //connection.Close();
+                }
+                else
+                {
+                    connection.Open();
+                    List<int> listOfSellersIDs = ListOfSellerIDs();
+                    int sameSellerIDIndex = listOfSellersIDs.FindIndex(x => x == id);
+                    if (sameSellerIDIndex != -1)
+                    {
+                        MessageBox.Show("Entered ID alredy exists.");
+                        connection.Close();
+                    }
+                    else if (!Validation())
+                    {
+                        connection.Close();
+                    }
+                    else
+                    {
+                        string insertQuery = $@"INSERT INTO dbo.Seller 
                         VALUES({IDTextBox.Text}, '{NameTextBox.Text}', {AgeTextBox.Text}, '{PhoneTextBox.Text}', '{PasswordTextBox.Text}')";
-                SqlCommand cmd = new SqlCommand(insertQuery, connection);
-                cmd.ExecuteNonQuery();
-                MessageBox.Show("Seller added successfully!");
-                connection.Close();
-                DisplayDataFromDB("Seller");
+                        SqlCommand cmd = new SqlCommand(insertQuery, connection);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Seller added successfully!");
+                        connection.Close();
+
+                        DisplayDataFromDB("Seller");
+                    }
+                }
+                
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                connection.Close();
             }
         }
 
+        private bool Validation()
+        {
+            if (IDTextBox.Text == "" || NameTextBox.Text == "" || AgeTextBox.Text == "" ||
+                    Convert.ToInt32(AgeTextBox.Text) <= 0 ||
+                    PhoneTextBox.Text == "" ||
+                    PasswordTextBox.Text == "")
+            {
+                MessageBox.Show("Enter valid data");
+                return false;
+            }
+            return true;
+        }
+
+        List<int> ListOfSellerIDs()
+        {
+            string query = "SELECT * FROM dbo.Seller";
+            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
+            SqlCommandBuilder cmd = new SqlCommandBuilder(adapter);
+            var dataSet = new DataSet();
+            adapter.Fill(dataSet);
+            DataTable sellerTable = dataSet.Tables[0];
+            List<int> sellerIDs = new List<int>();
+            foreach (DataRow row in sellerTable.Rows)
+            {
+                sellerIDs.Add(Convert.ToInt32(row["ID"]));
+            }
+
+            return sellerIDs;
+        }
         private void DisplayDataFromDB(string nameDB)
         {
             connection.Open();
@@ -76,6 +131,7 @@ namespace SupermarketManagementSystem
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Selected seller successfully deleted!");
                     connection.Close();
+
                     DisplayDataFromDB("Seller");
                     IDTextBox.Text = "";
                     NameTextBox.Text = "";
@@ -87,6 +143,7 @@ namespace SupermarketManagementSystem
             catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                connection.Close();
             }
         }
 
@@ -99,14 +156,7 @@ namespace SupermarketManagementSystem
         {
             try
             {
-                if (NameTextBox.Text == "" || AgeTextBox.Text == "" ||
-                    Convert.ToInt32(AgeTextBox.Text) <= 0 ||
-                    PhoneTextBox.Text == "" ||
-                    PasswordTextBox.Text == "")
-                {
-                    MessageBox.Show("Enter valid data");
-                }
-                else
+                if (Validation())
                 {
                     connection.Open();
                     string updateQuery = $@"UPDATE dbo.Seller SET Name='{NameTextBox.Text}',
@@ -121,6 +171,7 @@ namespace SupermarketManagementSystem
             }catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                connection.Close();
             }
         }
 
