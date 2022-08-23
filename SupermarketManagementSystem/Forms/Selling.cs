@@ -92,58 +92,67 @@ namespace SupermarketManagementSystem
 
         private void AddButton_Click(object sender, EventArgs e)
         {
-            if(IDTextBox.Text == "")
+            int id = 0;
+            if(!int.TryParse(IDTextBox.Text, out id))
             {
-                MessageBox.Show("Missing ID");
+                MessageBox.Show("Invalid ID");
             }
             else { 
                 try
                 {
-                    string tot = TotalLabel.Text.ToString();
-                    double d = Convert.ToDouble(tot);
-                    if (TotalLabel.Text.ToString().Contains(','))
+                    List<int> listOfBillIDs = ListOfBillIDs();
+                    int sameBillIDIndex = listOfBillIDs.FindIndex(x => x == id);
+                    if(sameBillIDIndex != -1)
                     {
-                        tot = String.Format("{0:0.00}", d);
+                        MessageBox.Show("Entered ID alredy exists.");
                     }
-
-                    connection.Open();
-                    string insertQuery = $@"INSERT INTO dbo.Bill 
-                            VALUES({IDTextBox.Text}, '{SellerNameLabel.Text}', '{DateTime.Now.ToString("yyyy-MM-dd")}', '{tot}')";
-                    SqlCommand cmd = new SqlCommand(insertQuery, connection);
-                    cmd.ExecuteNonQuery();
-                    MessageBox.Show("Order added successfully!");
-                    connection.Close();
-                    DisplayBillDataFromDB();
-                  
-                    int numOfRows = OrderData.RowCount-1;
-                    int billId = Convert.ToInt32(IDTextBox.Text.ToString());
-                    connection.Open();
-
-                    for (int i = 0; i < numOfRows; i++)
+                    else
                     {
-                        string prodName = OrderData.Rows[i].Cells[1].Value.ToString();
-                        int prodQuantity = Convert.ToInt32(OrderData.Rows[i].Cells[3].Value.ToString());
-                        string t = OrderData.Rows[i].Cells[2].Value.ToString();
-                        double prodPrice = Convert.ToDouble(t);
-                        if (t.Contains(','))
+                        string tot = TotalLabel.Text.ToString();
+                        double d = Convert.ToDouble(tot);
+                        if (TotalLabel.Text.ToString().Contains(','))
                         {
-                            t = String.Format("{0:0.00}", prodPrice);
+                            tot = String.Format("{0:0.00}", d);
                         }
-                        
-                        string insert = $@"USE Supermarket
-                            insert into dbo.Orders  
-                            VALUES('{prodName}', {prodQuantity}, '{t}', {billId})";
-                        SqlCommand cmd2 = new SqlCommand(insert, connection);
-                        cmd2.ExecuteNonQuery();
-                        
-                    }
-                    connection.Close();
 
-                    OrderData.Rows.Clear();
-                    orderTotal = 0;
-                    n = 0;
-                    IDTextBox.Text = "";
-                    TotalLabel.Text = "Total";
+                        connection.Open();
+                        string insertQuery = $@"INSERT INTO dbo.Bill 
+                            VALUES({id}, '{SellerNameLabel.Text}', '{DateTime.Now.ToString("yyyy-MM-dd")}', '{tot}')";
+                        SqlCommand cmd = new SqlCommand(insertQuery, connection);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Order added successfully!");
+                        connection.Close();
+                        DisplayBillDataFromDB();
+
+                        int numOfRows = OrderData.RowCount - 1;
+                        connection.Open();
+
+                        for (int i = 0; i < numOfRows; i++)
+                        {
+                            string prodName = OrderData.Rows[i].Cells[1].Value.ToString();
+                            int prodQuantity = Convert.ToInt32(OrderData.Rows[i].Cells[3].Value.ToString());
+                            string t = OrderData.Rows[i].Cells[2].Value.ToString();
+                            double prodPrice = Convert.ToDouble(t);
+                            if (t.Contains(','))
+                            {
+                                t = String.Format("{0:0.00}", prodPrice);
+                            }
+
+                            string insert = $@"USE Supermarket
+                            insert into dbo.Orders  
+                            VALUES('{prodName}', {prodQuantity}, '{t}', {id})";
+                            SqlCommand cmd2 = new SqlCommand(insert, connection);
+                            cmd2.ExecuteNonQuery();
+
+                        }
+                        connection.Close();
+
+                        OrderData.Rows.Clear();
+                        orderTotal = 0;
+                        n = 0;
+                        IDTextBox.Text = "";
+                        TotalLabel.Text = "Total"; 
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -152,6 +161,24 @@ namespace SupermarketManagementSystem
                 }
             }
         }
+
+        List<int> ListOfBillIDs()
+        {
+            string query = "SELECT * FROM dbo.Bill";
+            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
+            SqlCommandBuilder cmd = new SqlCommandBuilder(adapter);
+            var dataSet = new DataSet();
+            adapter.Fill(dataSet);
+            DataTable billTable = dataSet.Tables[0];
+            List<int> billIDs = new List<int>();
+            foreach (DataRow row in billTable.Rows)
+            {
+                billIDs.Add(Convert.ToInt32(row["ID"]));
+            }
+
+            return billIDs;
+        }
+
         private void DisplayBillDataFromDB()
         {
             connection.Open();
@@ -168,20 +195,21 @@ namespace SupermarketManagementSystem
         {
             try
             {
-                if (IDTextBox.Text == "")
+                int id = 0;
+                if (!int.TryParse(IDTextBox.Text, out id))
                 {
-                    MessageBox.Show("Select Bill to Delete");
+                    MessageBox.Show("Select the ID of Bill to Delete");
                 }
                 else
                 {
                     connection.Open();
                     //delete order bill from Orders table.
-                    string deleteOrderQuery = $"DELETE FROM dbo.Orders WHERE BillID={IDTextBox.Text}";
+                    string deleteOrderQuery = $"DELETE FROM dbo.Orders WHERE BillID={id}";
                     SqlCommand cmd1 = new SqlCommand(deleteOrderQuery, connection);
                     cmd1.ExecuteNonQuery();
                     
                     //delete bill from Bill table
-                    string deleteQuery = $"DELETE FROM dbo.Bill WHERE ID={IDTextBox.Text}";
+                    string deleteQuery = $"DELETE FROM dbo.Bill WHERE ID={id}";
                     SqlCommand cmd = new SqlCommand(deleteQuery, connection);
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Selected Bill deleted successfully.");
@@ -198,6 +226,7 @@ namespace SupermarketManagementSystem
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                connection.Close();
             }
         }
 
