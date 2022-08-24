@@ -19,7 +19,7 @@ namespace SupermarketManagementSystem
         }
 
         SqlConnection connection = new SqlConnection(@"Data Source=.;Initial Catalog=Supermarket;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
-
+      
         private void AddButton_Click(object sender, EventArgs e)
         {
             try
@@ -33,7 +33,7 @@ namespace SupermarketManagementSystem
                 else
                 {
                     connection.Open();
-                    List<int> listOfSellersIDs = ListOfSellerIDs();
+                    List<int> listOfSellersIDs = Globalization.ListOfIDFromDB("Seller");
                     int sameSellerIDIndex = listOfSellersIDs.FindIndex(x => x == id);
                     if (sameSellerIDIndex != -1)
                     {
@@ -76,23 +76,6 @@ namespace SupermarketManagementSystem
                 return false;
             }
             return true;
-        }
-
-        List<int> ListOfSellerIDs()
-        {
-            string query = "SELECT * FROM dbo.Seller";
-            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
-            SqlCommandBuilder cmd = new SqlCommandBuilder(adapter);
-            var dataSet = new DataSet();
-            adapter.Fill(dataSet);
-            DataTable sellerTable = dataSet.Tables[0];
-            List<int> sellerIDs = new List<int>();
-            foreach (DataRow row in sellerTable.Rows)
-            {
-                sellerIDs.Add(Convert.ToInt32(row["ID"]));
-            }
-
-            return sellerIDs;
         }
         public void DisplayDataFromDB(string nameDB)
         {
