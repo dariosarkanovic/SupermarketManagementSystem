@@ -50,43 +50,46 @@ namespace SupermarketManagementSystem
             this.Hide();
         }
 
+        private void CreateProduct()
+        {
+            int id = 0;
+            if (!int.TryParse(IDTextBox.Text, out id))
+            {
+                MessageBox.Show("Invalid ID");
+            }
+            else
+            {
+                connection.Open();
+                string price = PriceTextBox.Text.ToString();
+                List<int> listOfProductIDs = Globalization.ListOfIDFromDB("Product");
+                int sameProductIDindex = listOfProductIDs.FindIndex(x => x == Convert.ToInt32(IDTextBox.Text));
+
+                if (sameProductIDindex != -1)
+                {
+                    MessageBox.Show("Entered ID for product alredy exists.");
+                    connection.Close();
+                }
+                else
+                {
+                    if (price.Contains(','))
+                    {
+                        price = String.Format("{0:0.00}", Convert.ToDouble(price));
+                    }
+                    string insertQuery = $@"INSERT INTO dbo.Product 
+                        VALUES({id}, '{NameTextBox.Text}', {QuantityTextBox.Text}, '{SelectCategoryComboBox.SelectedValue.ToString()}', '{price}')";
+                    SqlCommand cmd = new SqlCommand(insertQuery, connection);
+                    cmd.ExecuteNonQuery();
+                    MessageBox.Show("Product added successfully!");
+                    connection.Close();
+                }
+            }
+        }
         private void AddButton_Click(object sender, EventArgs e)
         {
             try
             {
-                int id = 0;
-                if(!int.TryParse(IDTextBox.Text, out id))
-                {
-                    MessageBox.Show("Invalid ID");
-                }
-                else
-                {
-                    connection.Open();
-                    string price = PriceTextBox.Text.ToString();
-                    List<int> listOfProductIDs = Globalization.ListOfIDFromDB("Product");
-                    int sameProductIDindex = listOfProductIDs.FindIndex(x => x == Convert.ToInt32(IDTextBox.Text));
-
-                    if (sameProductIDindex != -1)
-                    {
-                        MessageBox.Show("Entered ID for product alredy exists.");
-                        connection.Close();
-                    }
-                    else
-                    {
-                        if (price.Contains(','))
-                        {
-                            price = String.Format("{0:0.00}", Convert.ToDouble(price));
-                        }
-                        string insertQuery = $@"INSERT INTO dbo.Product 
-                            VALUES({id}, '{NameTextBox.Text}', {QuantityTextBox.Text}, '{SelectCategoryComboBox.SelectedValue.ToString()}', '{price}')";
-                        SqlCommand cmd = new SqlCommand(insertQuery, connection);
-                        cmd.ExecuteNonQuery();
-                        MessageBox.Show("Product added successfully!");
-                        connection.Close();
-
-                        DisplayDataFromDB("Product");
-                    } 
-                }
+                CreateProduct();
+                DisplayDataFromDB("Product");
             }
             catch (Exception ex)
             {
@@ -119,7 +122,7 @@ namespace SupermarketManagementSystem
                 else
                 {
                     connection.Open();
-                    string deleteQuery = $"DELETE FROM dbo.Product WHERE ProdID={id}";
+                    string deleteQuery = $"DELETE FROM dbo.Product WHERE ID={id}";
                     SqlCommand cmd = new SqlCommand(deleteQuery, connection);
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Selected product deleted successfully.");
@@ -216,5 +219,6 @@ namespace SupermarketManagementSystem
             LoginForm login = new LoginForm();
             login.Show();
         }
+
     }
 }
