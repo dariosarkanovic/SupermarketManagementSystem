@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace SupermarketManagementSystem
 {
-    public partial class ProductForm : Form
+    public partial class ProductForm : Form, IDataConnection
     {
         public ProductForm()
         {
@@ -112,7 +112,7 @@ namespace SupermarketManagementSystem
             return productIDs;
         }
 
-        private void DisplayDataFromDB(string nameDB)
+        public void DisplayDataFromDB(string nameDB)
         {
             connection.Open();
             string query = $"SELECT * FROM dbo.{nameDB}";

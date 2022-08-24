@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace SupermarketManagementSystem
 {
-    public partial class SellerForm : Form
+    public partial class SellerForm : Form, IDataConnection
     {
         public SellerForm()
         {
@@ -94,7 +94,7 @@ namespace SupermarketManagementSystem
 
             return sellerIDs;
         }
-        private void DisplayDataFromDB(string nameDB)
+        public void DisplayDataFromDB(string nameDB)
         {
             connection.Open();
             string query = $"SELECT * FROM dbo.{nameDB}";

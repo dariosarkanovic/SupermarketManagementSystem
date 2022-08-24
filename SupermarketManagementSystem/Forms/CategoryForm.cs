@@ -9,9 +9,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace SupermarketManagementSystem
 {
-    public partial class CategoryForm : Form
+    public partial class CategoryForm : Form, IDataConnection
     {
         public CategoryForm()
         {
@@ -81,7 +82,7 @@ namespace SupermarketManagementSystem
             DisplayDataFromDB("Category");
         }
 
-        private void DisplayDataFromDB(string nameDB)
+        public void DisplayDataFromDB(string nameDB)
         {
             connection.Open();
             string query = $"SELECT * FROM dbo.{nameDB}";
