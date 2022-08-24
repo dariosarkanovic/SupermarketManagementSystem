@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace SupermarketManagementSystem
 {
-    public partial class Selling : Form
+    public partial class Selling : Form, IDataConnection
     {
         private string s;
         public Selling(string sellerName)
@@ -24,16 +24,29 @@ namespace SupermarketManagementSystem
         private void Selling_Load(object sender, EventArgs e)
         {
             
-            DisplayBillDataFromDB();
+            DisplayDataFromDB("Bill");
             fillComboBox();
             DisplayDataFromDB("Product");
             SellerNameLabel.Text = s;
         }
 
-        private void DisplayDataFromDB(string nameDB)
+        public void DisplayDataFromDB(string nameDB)
         {
+            string query = "";
+            if(nameDB == "Product")
+            {
+                 query = $"SELECT ProdName, ProdPrice FROM dbo.{nameDB}";
+            }
+            else if(nameDB == "Bill")
+            {
+                 query = $"SELECT * FROM dbo.{nameDB}";
+            }
+            else
+            {
+                MessageBox.Show("Can't find Database.");
+                return;
+            }
             connection.Open();
-            string query = $"SELECT ProdName, ProdPrice FROM dbo.{nameDB}";
             SqlDataAdapter dataAdapter = new SqlDataAdapter(query, connection);
             SqlCommandBuilder cmd = new SqlCommandBuilder(dataAdapter);
             DataSet dataSet = new DataSet();
@@ -122,7 +135,7 @@ namespace SupermarketManagementSystem
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Order added successfully!");
                         connection.Close();
-                        DisplayBillDataFromDB();
+                        DisplayDataFromDB("Bill");
 
                         int numOfRows = OrderData.RowCount - 1;
                         connection.Open();
@@ -179,18 +192,6 @@ namespace SupermarketManagementSystem
             return billIDs;
         }
 
-        private void DisplayBillDataFromDB()
-        {
-            connection.Open();
-            string query = $"SELECT * FROM dbo.Bill";
-            SqlDataAdapter dataAdapter = new SqlDataAdapter(query, connection);
-            SqlCommandBuilder builder = new SqlCommandBuilder(dataAdapter);
-            var dataSet = new DataSet();
-            dataAdapter.Fill(dataSet);
-            BillDataGrid.DataSource = dataSet.Tables[0];
-            connection.Close();
-        }
-
         private void DeleteButton_Click(object sender, EventArgs e)
         {
             try
@@ -216,7 +217,7 @@ namespace SupermarketManagementSystem
                     connection.Close();
 
                     //refresh DataGrid display
-                    DisplayBillDataFromDB();
+                    DisplayDataFromDB("Bill");
                     IDTextBox.Text = "";
                     NameTextBox.Text = "";
                     QuantityTextBox.Text = "";
