@@ -33,6 +33,7 @@ namespace SupermarketManagementSystem
         public void DisplayDataFromDB(string nameDB)
         {
             string query = "";
+            object datagrid;
             if(nameDB == "Product")
             {
                  query = $"SELECT ProdName, ProdPrice FROM dbo.{nameDB}";
@@ -51,7 +52,13 @@ namespace SupermarketManagementSystem
             SqlCommandBuilder cmd = new SqlCommandBuilder(dataAdapter);
             DataSet dataSet = new DataSet();
             dataAdapter.Fill(dataSet);
-            DataGrid.DataSource = dataSet.Tables[0];
+            if(nameDB == "Product") { 
+                DataGrid.DataSource = dataSet.Tables[0];
+            }
+            else
+            {
+                BillDataGrid.DataSource = dataSet.Tables[0];
+            }
             connection.Close();
         }
 
@@ -113,7 +120,7 @@ namespace SupermarketManagementSystem
             else { 
                 try
                 {
-                    List<int> listOfBillIDs = ListOfBillIDs();
+                    List<int> listOfBillIDs = Globalization.ListOfIDFromDB("Bill");
                     int sameBillIDIndex = listOfBillIDs.FindIndex(x => x == id);
                     if(sameBillIDIndex != -1)
                     {
@@ -173,23 +180,6 @@ namespace SupermarketManagementSystem
                     connection.Close();
                 }
             }
-        }
-
-        List<int> ListOfBillIDs()
-        {
-            string query = "SELECT * FROM dbo.Bill";
-            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
-            SqlCommandBuilder cmd = new SqlCommandBuilder(adapter);
-            var dataSet = new DataSet();
-            adapter.Fill(dataSet);
-            DataTable billTable = dataSet.Tables[0];
-            List<int> billIDs = new List<int>();
-            foreach (DataRow row in billTable.Rows)
-            {
-                billIDs.Add(Convert.ToInt32(row["ID"]));
-            }
-
-            return billIDs;
         }
 
         private void DeleteButton_Click(object sender, EventArgs e)

@@ -60,7 +60,7 @@ namespace SupermarketManagementSystem
             
                 List<string> categoryNames = ListOfCategoryNames();
                 int sameNameIndex = categoryNames.FindIndex(x => x.ToLower() == NameTextBox.Text.ToString().ToLower());
-                List<int> categoryIDs = ListOfCategoryIDs();
+                List<int> categoryIDs = Globalization.ListOfIDFromDB("Category");
                 int sameIDIndex = categoryIDs.FindIndex(x => x == id);
 
                 if (sameNameIndex != -1)
@@ -157,22 +157,6 @@ namespace SupermarketManagementSystem
             return categoryNames;
         }
 
-        List<int> ListOfCategoryIDs()
-        {
-            string query = "SELECT * FROM dbo.Category";
-            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
-            SqlCommandBuilder cmd = new SqlCommandBuilder(adapter);
-            var dataSet = new DataSet();
-            adapter.Fill(dataSet);
-            DataTable categoryTable = dataSet.Tables[0];
-            List<int> categoryIDs = new List<int>();
-            foreach (DataRow row in categoryTable.Rows)
-            {
-                categoryIDs.Add(Convert.ToInt32(row["ID"]));
-            }
-
-            return categoryIDs;
-        }
         private void EditButton_Click(object sender, EventArgs e)
         {
             try

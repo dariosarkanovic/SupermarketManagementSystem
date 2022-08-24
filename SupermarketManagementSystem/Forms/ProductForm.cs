@@ -63,7 +63,7 @@ namespace SupermarketManagementSystem
                 {
                     connection.Open();
                     string price = PriceTextBox.Text.ToString();
-                    List<int> listOfProductIDs = ListOfProductIDs();
+                    List<int> listOfProductIDs = Globalization.ListOfIDFromDB("Product");
                     int sameProductIDindex = listOfProductIDs.FindIndex(x => x == Convert.ToInt32(IDTextBox.Text));
 
                     if (sameProductIDindex != -1)
@@ -93,23 +93,6 @@ namespace SupermarketManagementSystem
                 MessageBox.Show(ex.Message);
                 connection.Close();
             }
-        }
-
-        List<int> ListOfProductIDs()
-        {
-            string query = "SELECT * FROM dbo.Product";
-            SqlDataAdapter adapter = new SqlDataAdapter(query, connection);
-            SqlCommandBuilder cmd = new SqlCommandBuilder(adapter);
-            var dataSet = new DataSet();
-            adapter.Fill(dataSet);
-            DataTable productTable = dataSet.Tables[0];
-            List<int> productIDs = new List<int>();
-            foreach (DataRow row in productTable.Rows)
-            {
-                productIDs.Add(Convert.ToInt32(row["ProdID"]));
-            }
-
-            return productIDs;
         }
 
         public void DisplayDataFromDB(string nameDB)
@@ -194,7 +177,7 @@ namespace SupermarketManagementSystem
                     connection.Open();
                     string updateQuery = $@"UPDATE dbo.Product SET ProdName='{NameTextBox.Text}',
                             ProdQuantity={QuantityTextBox.Text}, ProdPrice={PriceTextBox.Text},
-                            ProdCategory='{SelectCategoryComboBox.SelectedValue}' WHERE ProdID={IDTextBox.Text}";
+                            ProdCategory='{SelectCategoryComboBox.SelectedValue}' WHERE ID={IDTextBox.Text}";
                     SqlCommand cmd = new SqlCommand(updateQuery, connection);
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Selected product successfully updated.");
@@ -212,14 +195,7 @@ namespace SupermarketManagementSystem
 
         private void RefreshButton_Click(object sender, EventArgs e)
         {
-            connection.Open();
-            string query = $"SELECT * FROM dbo.Product";
-            SqlDataAdapter dataAdapter = new SqlDataAdapter(query, connection);
-            SqlCommandBuilder builder = new SqlCommandBuilder(dataAdapter);
-            var dataSet = new DataSet();
-            dataAdapter.Fill(dataSet);
-            DataGrid.DataSource = dataSet.Tables[0];
-            connection.Close();
+            DisplayDataFromDB("Product");
         }
 
         private void SellerButton_Click(object sender, EventArgs e)
