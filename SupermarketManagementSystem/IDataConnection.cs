@@ -9,5 +9,7 @@ namespace SupermarketManagementSystem
     internal interface IDataConnection
     {
         void DisplayDataFromDB(string name);
+
+        //void CreateProduct();
     }
 }
